@@ -1,0 +1,25 @@
+
+server:
+  port: 5055
+  servlet:
+    context-path: /api/v1
+
+spring:
+  application:
+    name: order-service
+  data:
+    mongodb:
+      uri: ${SAMPLEAPP_DB}
+      database: Cluster0
+  rabbitmq:
+    virtual-host: ewpqkngf
+    host: cow-01.rmq2.cloudamqp.com
+    password: ${SAMPLEAPP_RMQ_PWD}
+    port: 5672
+    username: ewpqkngf
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:5052/eureka

@@ -1,0 +1,53 @@
+server:
+  port: 5051
+
+app:
+  config:
+    api-path:
+      base: /api/v1
+    auth-server:
+      url: https://app.please-open.it/auth/realms/2fbc6acd-b72b-4b17-aa07-def03c4f3e47
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: orderModule
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=${app.config.api-path.base}/orders/**
+        - id: inventoryModule
+          uri: lb://INVENTORY-SERVICE
+          predicates:
+            - Path=${app.config.api-path.base}/inventory/**
+
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak-server:
+            token-uri: ${app.config.auth-server.url}/protocol/openid-connect/token
+            authorization-uri: ${app.config.auth-server.url}/protocol/openid-connect/auth
+            userinfo-uri: ${app.config.auth-server.url}/protocol/openid-connect/userinfo
+            user-name-attribute: preferred_username
+            jwt-set-uri: ${app.config.auth-server.url}/protocol/openid-connect/certs
+            user-info-authentication-method: header
+        registration:
+          GatewayClient:
+            provider: keycloak-server
+            client-id: app-auth
+            client-secret: ${SAMPLEAPP_KEYCLOAK_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+            scope: openid
+      resourceserver:
+        jwt:
+          issuer-uri: ${app.config.auth-server.url}
+          jwk-set-uri: ${app.config.auth-server.url}/protocol/openid-connect/certs
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:5052/eureka

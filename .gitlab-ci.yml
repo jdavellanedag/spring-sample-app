@@ -1,0 +1,16 @@
+image: maven:3.8.6-openjdk-11-slim
+
+stages:
+  - build
+  - test
+
+app-build:
+  stage: build
+  script:
+    - mvn clean install -Dmaven.test.skip=true
+
+unit-tests:
+  stage: test
+  script:
+    - mvn test -Dtest=OrderServiceTest -pl order-service
+    - mvn test -Dtest=ProductServiceTest -pl inventory-service
